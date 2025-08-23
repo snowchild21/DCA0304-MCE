@@ -37,16 +37,24 @@ Na próxima vez, só precisa usar:
 git push
 
 -------------------------------
-📌 5. Baixar alterações do GitHub
+📌 5. Baixar alterações do GitHub (integrar automaticamente)
 -------------------------------
 git pull origin main
 
-Pega as mudanças feitas por outras pessoas.
+Pega as mudanças feitas por outras pessoas e integra no seu código atual.
 
+-------------------------------
+📌 6. Baixar alterações do GitHub (sem integrar automaticamente)
+-------------------------------
+git fetch origin
+
+Busca as mudanças do remoto (GitHub) para o seu repositório local, mas não altera seu código atual.  
+Você pode analisar as mudanças e decidir quando integrá-las.
 
 -------------------------------
 🧠 Dicas:
 -------------------------------
 - Sempre rode `git pull origin main` antes de começar a programar.
+- Use `git fetch origin` para atualizar as informações do remoto sem mexer no código.
 - Escreva mensagens de commit claras.
 - Evite conflitos: atualize antes de dar `git push`.
