@@ -1,3 +1,52 @@
-git add ."arquivo.desejado" - altera os arquivos, pode-se se usar apenas o . ;
-git commit -m "blablabla" - adiciona um commit
-git push -u origin main - envia ao github
+INSTRUÇÕES PARA USAR O GIT
+
+-------------------------------
+📌 1. Verificar o status do repositório
+-------------------------------
+git status
+
+Mostra quais arquivos foram modificados, adicionados ou ainda não salvos (commitados).
+
+-------------------------------
+📌 2. Adicionar arquivos para commit
+-------------------------------
+git add .
+
+Adiciona TODOS os arquivos modificados.
+
+OU
+
+git add nome-do-arquivo.ext
+
+Adiciona apenas um arquivo específico.
+
+-------------------------------
+📌 3. Criar um commit
+-------------------------------
+git commit -m "Mensagem explicando o que foi feito"
+
+Exemplo:
+git commit -m "Adicionei função para alocar matriz"
+
+-------------------------------
+📌 4. Enviar as mudanças para o GitHub
+-------------------------------
+git push -u origin main
+
+Na próxima vez, só precisa usar:
+git push
+
+-------------------------------
+📌 5. Baixar alterações do GitHub
+-------------------------------
+git pull origin main
+
+Pega as mudanças feitas por outras pessoas.
+
+
+-------------------------------
+🧠 Dicas:
+-------------------------------
+- Sempre rode `git pull origin main` antes de começar a programar.
+- Escreva mensagens de commit claras.
+- Evite conflitos: atualize antes de dar `git push`.
