@@ -1,0 +1,3 @@
+git add ."arquivo.desejado" - altera os arquivos, pode-se se usar apenas o . ;
+git commit -m "blablabla" - adiciona um commit
+git push -u origin main - envia ao github
