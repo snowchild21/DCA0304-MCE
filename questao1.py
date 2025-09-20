@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def fatoracao_LU(A):
     """
@@ -143,6 +144,7 @@ if __name__ == "__main__":
             linha = "  ".join([f"{U[i, j]:<7.2f}" for j in range(n)])
             print(f"| {linha} |   | v{i+1} |   | {y[i]:<7.2f} |")
         print("-"*50)
+        
         input("\nPressione Enter para avançar")
 
         
@@ -153,25 +155,42 @@ if __name__ == "__main__":
             
         print("\n" + "="*50)
         input("\nPressione Enter para avançar")
-
-
-        print("\n" + "="*60)
-        print("   COMPARAÇÃO COM A SOLUÇÃO DIRETA DO NUMPY")
-        print("="*60)
-        
-        
-        v_numpy = np.linalg.solve(G, i_vetor)
-        
-        print("\nResultado usando np.linalg.solve(G, i):\n")
-        for i in range(n):
-            print(f"  v{i+1} = {v_numpy[i]:.8f} V")
-        
-        print("\n--- Módulo da Diferença Para Cada Tensão Nodal ---\n")
-        for i in range(n):
-            diferenca = np.abs(v[i] - v_numpy[i])
             
-            print(f"  Diferença em v{i+1}: |v - v_numpy| = {diferenca:.2e}")
-
-        
     except (ValueError, ZeroDivisionError) as e:
         print(f"\nOcorreu um erro durante os cálculos: {e}")
+    print("\n\n" + "="*60)
+    print("      Analise da Tensão V34 (tensao entre a condutancia G_6) para Diferentes Valores de I")
+    print("="*60)
+    input("\nPressione Enter para iniciar a análise dos casos I = [5, 10, 15, 20, 25] A...")
+
+    correntes_casos = [5.0, 10.0, 15.0, 20.0, 25.0]
+    vetores_v = []
+    tensoes_v34 = []
+
+    L_auto, U_auto = fatoracao_LU(G) # Fatora a matriz uma única vez
+
+    for i_casos in correntes_casos:
+        i_vetor = np.array([i_casos, -i_casos, 0.0, 0.0])
+        y = substituicao_direta(L_auto, i_vetor)
+        v = substituicao_reversa(U_auto, y)
+        v34 = v[2] - v[3]
+        vetores_v.append(v)
+        tensoes_v34.append(v34)
+        
+    print("\n\n")
+    for i in range(len(correntes_casos)):
+        print(f"Para I = {correntes_casos[i]:.1f} A ")
+        print(f"Vetor v: {np.round(vetores_v[i], 4)} V")
+        print(f"Tensão V34: {tensoes_v34[i]:.4f} V\n")
+
+    input("Pressione Enter para mostrar o gráfico final...")
+
+    # Plotagem do gráfico
+    plt.figure(figsize=(10, 6))
+    plt.plot(correntes_casos, tensoes_v34, marker='o', linestyle='--', color='r')
+    plt.title('Variação da Tensão V₃₄ em Função da Corrente da Fonte I', fontsize=16)
+    plt.xlabel('Corrente da Fonte, I [A]', fontsize=12)
+    plt.ylabel('Tensão V₃₄ = (V₃ - V₄) [V]', fontsize=12)
+    plt.xticks(correntes_casos)
+    plt.grid(True)
+    plt.show()
