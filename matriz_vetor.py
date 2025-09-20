@@ -7,6 +7,7 @@ Vetor com preenchimento manual ou aleatório.
 
 import random
 
+
 class MatrizQuadrada:
     def __init__(self, tamanho):
         """
@@ -34,6 +35,12 @@ class MatrizQuadrada:
             for j in range(self.tamanho):
                 self.matriz[i][j] = round(random.uniform(
                     0, 100), 5)  # valores entre 0 e 100
+
+    def preencher_fixo(self, valor):
+        """
+        Preenche a matriz com um valor fixo.
+        """
+        self.matriz = valor
 
     def mostrar(self):
         """
@@ -69,6 +76,12 @@ class Vetor:
         for i in range(self.tamanho):
             self.vetor[i] = round(random.uniform(
                 0, 100), 5)  # valores entre 0 e 100
+
+    def preencher_fixo(self, valor):
+        """
+        Preenche o vetor com um valor fixo.
+        """
+        self.vetor = valor
 
     def mostrar(self):
         """
