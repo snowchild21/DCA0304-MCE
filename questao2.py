@@ -9,8 +9,9 @@ from matriz_vetor import Vetor
 
 
 def main():
-    print("================= Análise nodal pelo método de Jordan =================")
-    print("Matriz G (condutâncias), vetor v (tensões nodais) e vetor i (correntes)\n")
+    print("|================== Análise nodal pelo método de Jordan ==================|")
+    print("| Matriz G (condutâncias), vetor v (tensões nodais) e vetor i (correntes) |")
+    print("|=========================================================================|\n")
 
     """
     DEFINIÇÃO DO PROBLEMA
@@ -65,12 +66,12 @@ def main():
 
                 else:
                     print("\n(!!!) ERRO: Por favor, digite apenas 1 ou 2.")
-                    break
+                    continue
             break
 
         else:
             print("\n(!!!) ERRO: Por favor, digite apenas 1 ou 2.")
-            break
+            continue
 
     """
     Exibição da matriz G e do vetor i.
@@ -90,6 +91,26 @@ def main():
         """
         pivo = m_G[i][i]  # Pivô da linha i
 
+        # Verifica se o pivô é zero
+        if pivo == 0:
+            # Tenta encontrar uma linha abaixo com um pivô não nulo
+            trocou = False
+            for k in range(i+1, qtd_nos):
+                if m_G[k][i] != 0:
+                    # Troca as linhas i e k
+                    m_G[i], m_G[k] = m_G[k], m_G[i]
+                    v_i[i], v_i[k] = v_i[k], v_i[i]
+                    pivo = m_G[i][i]  # Atualiza o pivô após a troca
+                    trocou = True
+                    break
+
+            if not trocou:
+                print("\n|=======================================================================|")
+                print(f"|  (!!!) ERRO: Não foi possível encontrar um pivô não nulo na coluna {i}. |")
+                print("|=======================================================================|")
+                return 0  # Para a execução se não for possível continuar
+
+        # Normaliza a linha i pelo pivô
         for j in range(qtd_nos):
             m_G[i][j] = m_G[i][j] / pivo  # Matriz
 
