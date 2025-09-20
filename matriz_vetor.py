@@ -50,6 +50,12 @@ class MatrizQuadrada:
         for linha in self.matriz:
             print(linha)
 
+    def __getitem__(self, index):
+        return self.matriz[index]
+
+    def __setitem__(self, index, value):
+        self.matriz[index] = value
+
 
 class Vetor:
     def __init__(self, tamanho):
@@ -58,7 +64,7 @@ class Vetor:
         Cria um vetor com todos os valores inicializados em 0.
         """
         self.tamanho = tamanho
-        self.vetor = [[0 for _ in range(tamanho)] for _ in range(tamanho)]
+        self.vetor = [0 for _ in range(tamanho)]
 
     def preencher_manual(self):
         """
@@ -90,3 +96,9 @@ class Vetor:
         print("Vetor:")
         for linha in self.vetor:
             print("[", linha, "]")
+
+    def __getitem__(self, index):
+        return self.vetor[index]
+
+    def __setitem__(self, index, value):
+        self.vetor[index] = value

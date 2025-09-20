@@ -9,10 +9,11 @@ from matriz_vetor import Vetor
 
 
 def main():
-    print("===== Análise nodal pelo método de Jordan =====")
+    print("================= Análise nodal pelo método de Jordan =================")
+    print("Matriz G (condutâncias), vetor v (tensões nodais) e vetor i (correntes)\n")
 
     """
-    Definição do problema.
+    DEFINIÇÃO DO PROBLEMA
     """
 
     while True:
@@ -77,6 +78,41 @@ def main():
     print("\nMatriz G (condutâncias):")
     m_G.mostrar()
     print("\nVetor i (correntes):")
+    v_i.mostrar()
+
+    """
+    RESOLUÇÃO DO SISTEMA LINEAR Gv = i PELO MÉTODO DE JORDAN
+    """
+
+    for i in range(qtd_nos):
+        """
+        Normalização da linha i
+        """
+        pivo = m_G[i][i]  # Pivô da linha i
+
+        for j in range(qtd_nos):
+            m_G[i][j] = m_G[i][j] / pivo  # Matriz
+
+        v_i[i] = v_i[i] / pivo  # Vetor
+
+        """
+        Zerar os elementos na coluna i, exceto o pivô
+        """
+        for k in range(qtd_nos):
+            if k != i:
+                fator = m_G[k][i]  # Elemento a ser zerado
+
+                for j in range(qtd_nos):
+                    m_G[k][j] = m_G[k][j] - fator * m_G[i][j]  # Matriz
+
+                v_i[k] = v_i[k] - fator * v_i[i]  # Vetor
+
+    """
+    Exibição da matriz G e do vetor solução do sistema Gv = i.
+    """
+    print("\nMatriz G após aplicação do método de Jordan:")
+    m_G.mostrar()
+    print("\nVetor v (tensões nodais) solução do sistema Gv = i:")
     v_i.mostrar()
 
 
