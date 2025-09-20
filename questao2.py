@@ -16,10 +16,14 @@ def main():
     """
 
     while True:
+        """
+        Valores predefinidos do código ou definidos pelo usuário (manual ou aleatoriamente).
+        """
         fixo = input(
             ">> Você deseja usar valores predefinidos do código para a matriz G e o vetor i?\n --- Digite 1: para sim;\n --- Digite 2: para não.\n"
         )
 
+        # Valores predefinidos do código
         if fixo == '1':
             matriz_fixa = [
                 [1.5, -0.5, 0, 0],
@@ -38,6 +42,7 @@ def main():
             v_i.preencher_fixo(vetor_fixo)
             break
 
+        # Valores definidos pelo usuário
         elif fixo == '2':
             qtd_nos = int(input(">> Digite a quantidade de nós: "))
             m_G = MatrizQuadrada(qtd_nos)
@@ -66,6 +71,9 @@ def main():
             print("\n(!!!) ERRO: Por favor, digite apenas 1 ou 2.")
             break
 
+    """
+    Exibição da matriz G e do vetor i.
+    """
     print("\nMatriz G (condutâncias):")
     m_G.mostrar()
     print("\nVetor i (correntes):")
