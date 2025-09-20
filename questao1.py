@@ -187,10 +187,10 @@ if __name__ == "__main__":
 
     # Plotagem do gráfico
     plt.figure(figsize=(10, 6))
-    plt.plot(correntes_casos, tensoes_v34, marker='o', linestyle='--', color='r')
-    plt.title('Variação da Tensão V₃₄ em Função da Corrente da Fonte I', fontsize=16)
+    plt.plot(correntes_casos, tensoes_v34, marker='o', linestyle='-', color='blue')
+    plt.title('Variação da Tensão V₃₄', fontsize=16)
     plt.xlabel('Corrente da Fonte, I [A]', fontsize=12)
-    plt.ylabel('Tensão V₃₄ = (V₃ - V₄) [V]', fontsize=12)
+    plt.ylabel('Tensão V₃₄[V]', fontsize=12)
     plt.xticks(correntes_casos)
     plt.grid(True)
     plt.show()
