@@ -1,6 +1,8 @@
 """
-Matriz quadrada com preenchimento manual ou aleatório.
-Vetor com preenchimento manual ou aleatório.
+Matriz quadrada e vetor com preenchimento manual, aleatório ou fixo.
+- Manual: O usuário insere os valores.
+- Aleatório: Gera valores aleatórios.
+- Fixo: Usa valores predefinidos no código.
 
 20/09/2025
 """
@@ -51,9 +53,15 @@ class MatrizQuadrada:
             print(linha)
 
     def __getitem__(self, index):
+        """
+        Permite acessar a matriz usando m[i][j].
+        """
         return self.matriz[index]
 
     def __setitem__(self, index, value):
+        """
+        Permite modificar a matriz usando m[i][j] = value.
+        """
         self.matriz[index] = value
 
 
@@ -98,7 +106,13 @@ class Vetor:
             print("[", linha, "]")
 
     def __getitem__(self, index):
+        """
+        Permite acessar o vetor usando v[i].
+        """
         return self.vetor[index]
 
     def __setitem__(self, index, value):
+        """
+        Permite modificar o vetor usando v[i] = value.
+        """
         self.vetor[index] = value
