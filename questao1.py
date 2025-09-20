@@ -158,9 +158,9 @@ if __name__ == "__main__":
             
     except (ValueError, ZeroDivisionError) as e:
         print(f"\nOcorreu um erro durante os cálculos: {e}")
-    print("\n\n" + "="*60)
+    print("\n\n" + "="*100)
     print("      Analise da Tensão V34 (tensao entre a condutancia G_6) para Diferentes Valores de I")
-    print("="*60)
+    print("="*100)
     input("\nPressione Enter para iniciar a análise dos casos I = [5, 10, 15, 20, 25] A...")
 
     correntes_casos = [5.0, 10.0, 15.0, 20.0, 25.0]
