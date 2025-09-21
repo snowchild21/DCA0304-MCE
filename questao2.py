@@ -17,22 +17,23 @@ def metodo_jordan(G, i):
 
     Retorno:
         v: vetor solução com tensões nodais (A).
+        G_id: matriz G transformada (deve ser identidade).
     """
     qtd_nos = len(i)
-    G = G.copy()
+    G_id = G.copy()  # copia para transformação
     i = i.copy()
 
     for col in range(qtd_nos):
-        pivo = G[col, col]
+        pivo = G_id[col, col]
 
         # Troca linha se pivô for zero
         if pivo == 0:
             trocou = False
             for k in range(col + 1, qtd_nos):
-                if G[k, col] != 0:
-                    G[[col, k]] = G[[k, col]]
+                if G_id[k, col] != 0:
+                    G_id[[col, k]] = G_id[[k, col]]
                     i[col], i[k] = i[k], i[col]
-                    pivo = G[col, col]
+                    pivo = G_id[col, col]
                     trocou = True
                     break
             if not trocou:
@@ -40,28 +41,28 @@ def metodo_jordan(G, i):
                     f"Pivô zero na coluna {col}, impossível continuar.")
 
         # Normaliza linha do pivô
-        G[col, :] = G[col, :] / pivo
+        G_id[col, :] = G_id[col, :] / pivo
         i[col] = i[col] / pivo
 
         # Zera os elementos da coluna exceto o pivô
         for k in range(qtd_nos):
             if k != col:
-                fator = G[k, col]
-                G[k, :] = G[k, :] - fator * G[col, :]
+                fator = G_id[k, col]
+                G_id[k, :] = G_id[k, :] - fator * G_id[col, :]
                 i[k] = i[k] - fator * i[col]
 
-    return i
+    return i, G_id
 
 
 def mostrar_sistema(G, i):
     """
-    Mostra o sistema G.v = i.
+    Mostra o sistema G.v = i com 4 casas decimais.
     """
     n = len(i)
     print("\nSistema G.v = i:")
     for row in range(n):
-        linha = "  ".join(f"{G[row, col]:>7.3f}" for col in range(n))
-        print(f"| {linha} |  | v{row+1} | = | {i[row]:>7.3f} |")
+        linha = "  ".join(f"{G[row, col]:>9.4f}" for col in range(n))
+        print(f"| {linha} |  | v{row+1} | = | {i[row]:>9.4f} |")
 
 
 def main():
@@ -78,7 +79,6 @@ def main():
         )
 
         if fixo == "1":
-            # Valores predefinidos do enunciado
             G = np.array([
                 [1.5, -0.5, 0.0, 0.0],
                 [-0.5, 1.5, -0.5, 0.0],
@@ -101,22 +101,19 @@ def main():
                 )
 
                 if manual_aleatorio == "1":
-                    # Preenchimento manual da matriz
                     print("\nDigite os valores da matriz G:")
                     for a in range(qtd_nos):
                         for b in range(qtd_nos):
                             G[a, b] = float(input(f"G[{a}][{b}] = "))
-                    # Preenchimento manual do vetor i
                     print("\nDigite os valores do vetor i:")
                     for a in range(qtd_nos):
                         i[a] = float(input(f"i[{a}] = "))
                     break
 
                 elif manual_aleatorio == "2":
-                    # Preenchimento aleatório da matriz e vetor
                     G = np.round(
-                        np.random.uniform(-5, 5, size=(qtd_nos, qtd_nos)), 3)
-                    i = np.round(np.random.uniform(-10, 10, size=qtd_nos), 3)
+                        np.random.uniform(-5, 5, size=(qtd_nos, qtd_nos)), 4)
+                    i = np.round(np.random.uniform(-10, 10, size=qtd_nos), 4)
                     break
 
                 else:
@@ -131,23 +128,23 @@ def main():
     print("\nSistema inicial:")
     mostrar_sistema(G, i)
     input("\nPressione Enter para resolver o sistema pelo método de Jordan...")
-    print("-"*75)
+    print("-"*80)
 
     # Resolução
     try:
-        v = metodo_jordan(G, i)
-        # Mostra sistema final
+        v, G_final = metodo_jordan(G, i)
+
+        # Mostra sistema final (G transformada e vetor solução)
         print("\nSistema final (matriz transformada e vetor solução):")
-        mostrar_sistema(G, v)
-        print("-"*75)
+        mostrar_sistema(G_final, v)
+        print("-"*80)
 
         # Tensões nodais
         print("\nTensões nodais:")
         for idx, val in enumerate(v):
             print(f"v{idx+1} = {val:.4f} V")
-        print("="*75)
+        print("="*80)
 
-    # Tratamento de erros
     except ValueError as e:
         print(f"\nErro: {e}")
 
