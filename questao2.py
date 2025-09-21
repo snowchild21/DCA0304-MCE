@@ -1,22 +1,21 @@
 """
-Análise nodal pelo método de Jordan (usando apenas NumPy).
+Análise nodal pelo método de Jordan (versão limpa e formatada).
 
 21/09/2025
 """
 
 import numpy as np
 
-
 def metodo_jordan(G, i):
     """
-    Resolve o sistema linear Gv = i pelo método de Jordan.
+    Resolve o sistema Gv = i pelo método de Jordan.
     
     Parâmetros:
-        G (np.ndarray): matriz quadrada de condutâncias.
-        i (np.ndarray): vetor de correntes.
-    
+        G: matriz quadrada de condutâncias.
+        i: vetor de correntes.
+        
     Retorno:
-        v (np.ndarray): vetor solução com as tensões nodais.
+        v: vetor solução com tensões nodais.
     """
     qtd_nos = len(i)
     G = G.copy()
@@ -25,7 +24,7 @@ def metodo_jordan(G, i):
     for col in range(qtd_nos):
         pivo = G[col, col]
 
-        # Se pivô é zero → tenta trocar de linha
+        # Troca linha se pivô for zero
         if pivo == 0:
             trocou = False
             for k in range(col + 1, qtd_nos):
@@ -36,13 +35,13 @@ def metodo_jordan(G, i):
                     trocou = True
                     break
             if not trocou:
-                raise ValueError(f"Não foi possível encontrar um pivô não nulo na coluna {col}.")
+                raise ValueError(f"Pivô zero na coluna {col}, impossível continuar.")
 
-        # Normaliza a linha atual
+        # Normaliza linha do pivô
         G[col, :] = G[col, :] / pivo
         i[col] = i[col] / pivo
 
-        # Zera os elementos da coluna atual, exceto o pivô
+        # Zera os elementos da coluna exceto o pivô
         for k in range(qtd_nos):
             if k != col:
                 fator = G[k, col]
@@ -51,18 +50,25 @@ def metodo_jordan(G, i):
 
     return i
 
+def mostrar_sistema(G, i):
+    """
+    Mostra o sistema G.v = i em formato bonito.
+    """
+    n = len(i)
+    print("\nSistema G.v = i:")
+    for row in range(n):
+        linha = "  ".join(f"{G[row, col]:>7.3f}" for col in range(n))
+        print(f"| {linha} |  | v{row+1} | = | {i[row]:>7.3f} |")
 
 def main():
     print("|================== Análise nodal pelo método de Jordan ==================|")
     print("| Matriz G (condutâncias), vetor v (tensões nodais) e vetor i (correntes) |")
     print("|=========================================================================|\n")
 
-    """
-    DEFINIÇÃO DO PROBLEMA
-    """
+    # Definição do problema
     while True:
         fixo = input(
-            ">> Você deseja usar valores predefinidos do código para a matriz G e o vetor i?\n"
+            ">> Deseja usar valores predefinidos do código para a matriz G e o vetor i?\n"
             " --- Digite 1: para sim;\n"
             " --- Digite 2: para não.\n"
         )
@@ -74,10 +80,7 @@ def main():
                 [0.0, -0.5, 1.625, -0.5],
                 [0.0, 0.0, -0.5, 0.6]
             ], dtype=float)
-
             i = np.array([35.0, -10.0, 0.0, 2.0], dtype=float)
-
-            qtd_nos = len(i)
             break
 
         elif fixo == "2":
@@ -87,56 +90,57 @@ def main():
 
             while True:
                 manual_aleatorio = input(
-                    ">> Você deseja preencher o sistema Gv = i...\n"
+                    ">> Deseja preencher o sistema Gv = i manualmente ou aleatoriamente?\n"
                     " --- Digite 1: Manualmente;\n"
                     " --- Digite 2: Aleatoriamente?\n"
                 )
 
                 if manual_aleatorio == "1":
+                    # Preenchimento manual da matriz
                     print("\nDigite os valores da matriz G:")
                     for a in range(qtd_nos):
                         for b in range(qtd_nos):
                             G[a, b] = float(input(f"G[{a}][{b}] = "))
-
+                    # Preenchimento manual do vetor i
                     print("\nDigite os valores do vetor i:")
                     for a in range(qtd_nos):
                         i[a] = float(input(f"i[{a}] = "))
                     break
 
                 elif manual_aleatorio == "2":
-                    G = np.round(np.random.uniform(-5, 5, size=(qtd_nos, qtd_nos)), 3)
+                    # Preenchimento aleatório da matriz e vetor
+                    G = np.round(
+                        np.random.uniform(-5, 5, size=(qtd_nos, qtd_nos)), 3)
                     i = np.round(np.random.uniform(-10, 10, size=qtd_nos), 3)
                     break
 
                 else:
-                    print("\n(!!!) ERRO: Por favor, digite apenas 1 ou 2.")
+                    print("\n(!!!) Digite apenas 1 ou 2.")
                     continue
             break
-
         else:
-            print("\n(!!!) ERRO: Por favor, digite apenas 1 ou 2.")
+            print("\n(!!!) Digite apenas 1 ou 2.")
             continue
 
-    """
-    Exibição da matriz G e do vetor i.
-    """
-    print("\nMatriz G (condutâncias):")
-    print(G)
-    print("\nVetor i (correntes):")
-    print(i)
+    # Mostra sistema inicial bonitinho
+    print("\nSistema inicial:")
+    mostrar_sistema(G, i)
+    input("\nPressione Enter para resolver o sistema pelo método de Jordan...")
 
-    """
-    Resolução do sistema pelo método de Jordan
-    """
+    # Resolução
     try:
         v = metodo_jordan(G, i)
-        print("\nMatriz G após aplicação do método de Jordan:")
-        print(np.round(G, 4))
-        print("\nVetor v (tensões nodais) solução do sistema Gv = i:")
-        print(np.round(v, 4))
+        # Mostra sistema final
+        print("\nSistema final (matriz transformada e vetor solução):")
+        mostrar_sistema(G, v)
+
+        # Tensões nodais
+        print("\nTensões nodais:")
+        for idx, val in enumerate(v):
+            print(f"v{idx+1} = {val:.4f} V")
+
     except ValueError as e:
         print(f"\nErro: {e}")
-
 
 if __name__ == "__main__":
     main()
