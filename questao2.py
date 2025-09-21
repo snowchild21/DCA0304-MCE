@@ -128,22 +128,22 @@ def main():
     print("\nSistema inicial:")
     mostrar_sistema(G, i)
     input("\nPressione Enter para resolver o sistema pelo método de Jordan...")
-    print("-"*80)
+    print("-"*75)
 
     # Resolução
     try:
         v, G_final = metodo_jordan(G, i)
 
-        # Mostra sistema final (G transformada e vetor solução)
-        print("\nSistema final (matriz transformada e vetor solução):")
+        # Mostra sistema final (G identidade e vetor solução)
+        print("\nSistema final (matriz identidade e vetor solução):")
         mostrar_sistema(G_final, v)
-        print("-"*80)
+        print("-"*75)
 
         # Tensões nodais
         print("\nTensões nodais:")
         for idx, val in enumerate(v):
             print(f"v{idx+1} = {val:.4f} V")
-        print("="*80)
+        print("="*75)
 
     except ValueError as e:
         print(f"\nErro: {e}")
