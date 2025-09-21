@@ -10,39 +10,49 @@ import matplotlib.pyplot as plt
 
 def fatoracao_LU(A):
     """
-    Este método consiste em quebrar o sistema Gv = i em dois sistemas triangulares:
-        G = LU  (fatoração LU)
-        (LU)v = i
-        Ly = i   (substituição direta, pois L é triangular inferior)
-        Uv = y   (substituição reversa, pois U é triangular superior)
+    Este método realiza a fatoração LU da matriz A, de modo que A = L * U,
+    onde L é triangular inferior e U é triangular superior.
 
-    Ao resolvermos esses dois sistemas, obtemos o vetor v.
+    Parâmetros:
+        A: matriz quadrada
+
+    Retorno:
+        L: matriz triangular inferior
+        U: matriz triangular superior
     """
     A = np.array(A, dtype=float)
     n = A.shape[0]
 
+    # Verifica se a matriz é quadrada
     if A.shape[0] != A.shape[1]:
         raise ValueError("Erro crítico: a matriz deve ser quadrada.")
 
+    # Inicializa L e U
     L = np.zeros((n, n), dtype=float)
     U = np.zeros((n, n), dtype=float)
 
+    # Preenche diagonal de L com 1
     for i in range(n):
         L[i, i] = 1.0
 
+    # Algoritmo da fatoração LU
     for k in range(n):
+        # Calcula pivô da diagonal da U
         soma_u = sum(L[k, m] * U[m, k] for m in range(k))
         U[k, k] = A[k, k] - soma_u
 
+        # Verifica pivô muito pequeno (evita divisão por zero)
         if abs(U[k, k]) < 1e-15:
             raise ZeroDivisionError(
                 f"Erro crítico: pivô U[{k},{k}] é zero. Fatoração LU falhou."
             )
 
+        # Calcula os elementos restantes da linha k de U
         for j in range(k + 1, n):
             soma_u = sum(L[k, m] * U[m, j] for m in range(k))
             U[k, j] = A[k, j] - soma_u
 
+        # Calcula os elementos da coluna k de L abaixo da diagonal
         for i in range(k + 1, n):
             soma_l = sum(L[i, m] * U[m, k] for m in range(k))
             L[i, k] = (A[i, k] - soma_l) / U[k, k]
@@ -51,7 +61,10 @@ def fatoracao_LU(A):
 
 
 def substituicao_direta(L, b):
-    """Resolve o sistema Ly = b."""
+    """
+    Resolve Ly = b usando substituição direta (forward substitution)
+    para matrizes triangulares inferiores.
+    """
     n = L.shape[0]
     y = np.zeros(n, dtype=float)
 
@@ -63,7 +76,10 @@ def substituicao_direta(L, b):
 
 
 def substituicao_reversa(U, y):
-    """Resolve o sistema Uv = y."""
+    """
+    Resolve Uv = y usando substituição reversa (backward substitution)
+    para matrizes triangulares superiores.
+    """
     n = U.shape[0]
     v = np.zeros(n, dtype=float)
 
@@ -82,17 +98,18 @@ def main():
     # Definição da matriz G do circuito
     G = np.array([
         [-4.0,  1.0,   2.0,   0.0],
-        [ 1.0, -4.0,   0.0,   2.0],
-        [ 2.0,  0.0, -24.0,  20.0],
-        [ 0.0,  2.0,  20.0, -24.0]
+        [1.0, -4.0,   0.0,   2.0],
+        [2.0,  0.0, -24.0,  20.0],
+        [0.0,  2.0,  20.0, -24.0]
     ])
 
+    # Mostra a matriz G inicial
     print("\nMatriz de Condutâncias (G) do circuito [mho]:\n")
     print(G)
-    print("-" * 73)
-    input("\nPressione Enter para avançar")
+    input("\nPressione Enter para continuar...")
+    print("-" * 75)
 
-    # Definição da fonte de corrente
+    # Entrada do usuário: corrente da fonte
     while True:
         try:
             entrada = input("\n>> Digite o valor da corrente I (em Amperes): ")
@@ -101,53 +118,60 @@ def main():
         except ValueError:
             print("   Erro: Entrada inválida. Digite apenas números (ex: 10.5).")
 
+    # Define vetor de correntes do circuito
     i_vetor = np.array([I_valor, -I_valor, 0.0, 0.0])
     print(f"\nVetor de correntes (i):\n{i_vetor}")
-    print("-" * 50)
-    input("\nPressione Enter para avançar")
+    input("\nPressione Enter para continuar...")
+    print("-" * 75)
 
     try:
         # Fatoração LU
         L, U = fatoracao_LU(G)
+
+        # Resolve Ly = i
         y = substituicao_direta(L, i_vetor)
+
+        # Resolve Uv = y
         v = substituicao_reversa(U, y)
         n = G.shape[0]
 
+        # Mostra o sistema original e o vetor de corrente
         print("\nSistema Original (G.v = i):\n")
         for i in range(n):
             linha = "  ".join([f"{G[i, j]:<6.1f}" for j in range(n)])
             print(f"| {linha} |   | v{i+1} |   | {i_vetor[i]:<6.2f} |")
-        print("-" * 50)
-        input("\nPressione Enter para avançar")
+        input("\nPressione Enter para continuar...")
+        print("-" * 75)
 
+        # Mostra a decomposição LU
         print("\nDecomposição LU da matriz G:\n")
         print("Matriz L:\n", np.round(L, 4))
         print("\nMatriz U:\n", np.round(U, 4))
-        print("-" * 50)
-        input("\nPressione Enter para avançar")
+        input("\nPressione Enter para continuar...")
+        print("-" * 75)
 
+        # Mostra a solução final do sistema
         print("\nSolução do sistema:\n")
         for i in range(n):
             print(f"  v{i+1} = {v[i]:.4f} V")
-
-        print("\n" + "=" * 50)
-        input("\nPressione Enter para avançar")
+        input("\nPressione Enter para continuar...")
 
     except (ValueError, ZeroDivisionError) as e:
         print(f"\nOcorreu um erro durante os cálculos: {e}")
         return
 
-    # Análise para diferentes valores de I
-    print("\n" + "=" * 100)
+    # Análise para diferentes valores de corrente I
+    print("\n" + "=" * 75)
     print(" Análise da Tensão V34 (diferença de potencial entre v3 e v4) ")
-    print("=" * 100)
-    input("\nPressione Enter para iniciar a análise dos casos I = [5, 10, 15, 20, 25] A...")
+    print("=" * 75)
+    input(
+        "Pressione Enter para iniciar a análise dos casos I = [5, 10, 15, 20, 25] A...")
 
     correntes_casos = [5.0, 10.0, 15.0, 20.0, 25.0]
     vetores_v = []
     tensoes_v34 = []
 
-    # Fatora apenas uma vez
+    # Fatoração LU feita uma única vez
     L_auto, U_auto = fatoracao_LU(G)
 
     for I in correntes_casos:
@@ -159,6 +183,7 @@ def main():
         vetores_v.append(v)
         tensoes_v34.append(v34)
 
+    # Exibe resultados
     print("\nResultados para diferentes valores de I:\n")
     for idx, I in enumerate(correntes_casos):
         print(f"Para I = {I:.1f} A:")
@@ -167,9 +192,10 @@ def main():
 
     input("Pressione Enter para mostrar o gráfico final...")
 
-    # Plot
+    # Plot do gráfico da tensão V34
     plt.figure(figsize=(10, 6))
-    plt.plot(correntes_casos, tensoes_v34, marker='o', linestyle='-', color='blue')
+    plt.plot(correntes_casos, tensoes_v34,
+             marker='o', linestyle='-', color='blue')
     plt.title('Variação da Tensão V₃₄', fontsize=16)
     plt.xlabel('Corrente da Fonte I [A]', fontsize=12)
     plt.ylabel('Tensão V₃₄ [V]', fontsize=12)
