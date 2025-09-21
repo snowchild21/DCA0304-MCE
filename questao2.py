@@ -1,11 +1,10 @@
 """
-Análise nodal pelo método de Jordan.
+Análise nodal pelo método de Jordan (usando apenas NumPy).
 
-20/09/2025
+21/09/2025
 """
 
-from matriz_vetor import MatrizQuadrada
-from matriz_vetor import Vetor
+import numpy as np
 
 
 def main():
@@ -18,50 +17,51 @@ def main():
     """
 
     while True:
-        """
-        Valores predefinidos do código ou definidos pelo usuário (manual ou aleatoriamente).
-        """
         fixo = input(
-            ">> Você deseja usar valores predefinidos do código para a matriz G e o vetor i?\n --- Digite 1: para sim;\n --- Digite 2: para não.\n"
+            ">> Você deseja usar valores predefinidos do código para a matriz G e o vetor i?\n"
+            " --- Digite 1: para sim;\n"
+            " --- Digite 2: para não.\n"
         )
 
-        # Valores predefinidos do código
-        if fixo == '1':
-            matriz_fixa = [
+        if fixo == "1":
+            G = np.array([
                 [1.5, -0.5, 0.0, 0.0],
                 [-0.5, 1.5, -0.5, 0.0],
                 [0.0, -0.5, 1.625, -0.5],
                 [0.0, 0.0, -0.5, 0.6]
-            ]
-            vetor_fixo = [35.0, -10.0, 0.0, 2.0]
+            ], dtype=float)
 
-            qtd_nos = len(vetor_fixo)
+            i = np.array([35.0, -10.0, 0.0, 2.0], dtype=float)
 
-            m_G = MatrizQuadrada(qtd_nos)
-            v_i = Vetor(qtd_nos)
-
-            m_G.preencher_fixo(matriz_fixa)
-            v_i.preencher_fixo(vetor_fixo)
+            qtd_nos = len(i)
             break
 
-        # Valores definidos pelo usuário
-        elif fixo == '2':
+        elif fixo == "2":
             qtd_nos = int(input(">> Digite a quantidade de nós: "))
-            m_G = MatrizQuadrada(qtd_nos)
-            v_i = Vetor(qtd_nos)
+            G = np.zeros((qtd_nos, qtd_nos), dtype=float)
+            i = np.zeros(qtd_nos, dtype=float)
 
             while True:
                 manual_aleatorio = input(
-                    ">> Você deseja preencher o sistema Gv = i...\n --- Digite 1: Manualmente;\n --- Digite 2: Aleatoriamente?\n")
+                    ">> Você deseja preencher o sistema Gv = i...\n"
+                    " --- Digite 1: Manualmente;\n"
+                    " --- Digite 2: Aleatoriamente?\n"
+                )
 
-                if manual_aleatorio == '1':
-                    m_G.preencher_manual()
-                    v_i.preencher_manual()
+                if manual_aleatorio == "1":
+                    print("\nDigite os valores da matriz G:")
+                    for a in range(qtd_nos):
+                        for b in range(qtd_nos):
+                            G[a, b] = float(input(f"G[{a}][{b}] = "))
+
+                    print("\nDigite os valores do vetor i:")
+                    for a in range(qtd_nos):
+                        i[a] = float(input(f"i[{a}] = "))
                     break
 
-                elif manual_aleatorio == '2':
-                    m_G.preencher_aleatorio()
-                    v_i.preencher_aleatorio()
+                elif manual_aleatorio == "2":
+                    G = np.round(np.random.uniform(-5, 5, size=(qtd_nos, qtd_nos)), 3)
+                    i = np.round(np.random.uniform(-10, 10, size=qtd_nos), 3)
                     break
 
                 else:
@@ -77,64 +77,51 @@ def main():
     Exibição da matriz G e do vetor i.
     """
     print("\nMatriz G (condutâncias):")
-    m_G.mostrar()
+    print(G)
     print("\nVetor i (correntes):")
-    v_i.mostrar()
+    print(i)
 
     """
     RESOLUÇÃO DO SISTEMA LINEAR Gv = i PELO MÉTODO DE JORDAN
     """
+    for col in range(qtd_nos):
+        # Pivô da coluna atual
+        pivo = G[col, col]
 
-    for i in range(qtd_nos):
-        """
-        Normalização da linha i
-        """
-        pivo = m_G[i][i]  # Pivô da linha i
-
-        # Verifica se o pivô é zero
+        # Se pivô é zero → tenta trocar de linha
         if pivo == 0:
-            # Tenta encontrar uma linha abaixo com um pivô não nulo
             trocou = False
-            for k in range(i+1, qtd_nos):
-                if m_G[k][i] != 0:
-                    # Troca as linhas i e k
-                    m_G[i], m_G[k] = m_G[k], m_G[i]
-                    v_i[i], v_i[k] = v_i[k], v_i[i]
-                    pivo = m_G[i][i]  # Atualiza o pivô após a troca
+            for k in range(col + 1, qtd_nos):
+                if G[k, col] != 0:
+                    G[[col, k]] = G[[k, col]]
+                    i[col], i[k] = i[k], i[col]
+                    pivo = G[col, col]
                     trocou = True
                     break
-
             if not trocou:
                 print("\n|=======================================================================|")
-                print(f"|  (!!!) ERRO: Não foi possível encontrar um pivô não nulo na coluna {i}. |")
+                print(f"|  (!!!) ERRO: Não foi possível encontrar um pivô não nulo na coluna {col}. |")
                 print("|=======================================================================|")
-                return 0  # Para a execução se não for possível continuar
+                return 0
 
-        # Normaliza a linha i pelo pivô
-        for j in range(qtd_nos):
-            m_G[i][j] = m_G[i][j] / pivo  # Matriz
+        # Normaliza a linha atual
+        G[col, :] = G[col, :] / pivo
+        i[col] = i[col] / pivo
 
-        v_i[i] = v_i[i] / pivo  # Vetor
-
-        """
-        Zerar os elementos na coluna i, exceto o pivô
-        """
+        # Zera os elementos da coluna atual, exceto o pivô
         for k in range(qtd_nos):
-            if k != i:
-                fator = m_G[k][i]  # Elemento a ser zerado
-
-                for j in range(qtd_nos):
-                    m_G[k][j] = m_G[k][j] - fator * m_G[i][j]  # Matriz
-
-                v_i[k] = v_i[k] - fator * v_i[i]  # Vetor
+            if k != col:
+                fator = G[k, col]
+                G[k, :] = G[k, :] - fator * G[col, :]
+                i[k] = i[k] - fator * i[col]
 
     """
     Exibição da matriz G e do vetor solução do sistema Gv = i.
     """
     print("\nMatriz G após aplicação do método de Jordan:")
-    m_G.mostrar()
+    print(np.round(G, 4))
     print("\nVetor v (tensões nodais) solução do sistema Gv = i:")
-    v_i.mostrar()
+    print(np.round(i, 4))
 
 
 if __name__ == "__main__":
