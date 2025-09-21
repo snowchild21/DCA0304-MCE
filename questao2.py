@@ -1,21 +1,22 @@
 """
-Análise nodal pelo método de Jordan (versão limpa e formatada).
+Análise nodal pelo método de Jordan.
 
 21/09/2025
 """
 
 import numpy as np
 
+
 def metodo_jordan(G, i):
     """
     Resolve o sistema Gv = i pelo método de Jordan.
-    
+
     Parâmetros:
-        G: matriz quadrada de condutâncias.
-        i: vetor de correntes.
-        
+        G: matriz quadrada de condutâncias (mho).
+        i: vetor de correntes (A).
+
     Retorno:
-        v: vetor solução com tensões nodais.
+        v: vetor solução com tensões nodais (A).
     """
     qtd_nos = len(i)
     G = G.copy()
@@ -35,7 +36,8 @@ def metodo_jordan(G, i):
                     trocou = True
                     break
             if not trocou:
-                raise ValueError(f"Pivô zero na coluna {col}, impossível continuar.")
+                raise ValueError(
+                    f"Pivô zero na coluna {col}, impossível continuar.")
 
         # Normaliza linha do pivô
         G[col, :] = G[col, :] / pivo
@@ -50,15 +52,17 @@ def metodo_jordan(G, i):
 
     return i
 
+
 def mostrar_sistema(G, i):
     """
-    Mostra o sistema G.v = i em formato bonito.
+    Mostra o sistema G.v = i.
     """
     n = len(i)
     print("\nSistema G.v = i:")
     for row in range(n):
         linha = "  ".join(f"{G[row, col]:>7.3f}" for col in range(n))
         print(f"| {linha} |  | v{row+1} | = | {i[row]:>7.3f} |")
+
 
 def main():
     print("|================== Análise nodal pelo método de Jordan ==================|")
@@ -74,6 +78,7 @@ def main():
         )
 
         if fixo == "1":
+            # Valores predefinidos do enunciado
             G = np.array([
                 [1.5, -0.5, 0.0, 0.0],
                 [-0.5, 1.5, -0.5, 0.0],
@@ -122,10 +127,11 @@ def main():
             print("\n(!!!) Digite apenas 1 ou 2.")
             continue
 
-    # Mostra sistema inicial bonitinho
+    # Mostra sistema inicial
     print("\nSistema inicial:")
     mostrar_sistema(G, i)
     input("\nPressione Enter para resolver o sistema pelo método de Jordan...")
+    print("-"*75)
 
     # Resolução
     try:
@@ -133,14 +139,18 @@ def main():
         # Mostra sistema final
         print("\nSistema final (matriz transformada e vetor solução):")
         mostrar_sistema(G, v)
+        print("-"*75)
 
         # Tensões nodais
         print("\nTensões nodais:")
         for idx, val in enumerate(v):
             print(f"v{idx+1} = {val:.4f} V")
+        print("="*75)
 
+    # Tratamento de erros
     except ValueError as e:
         print(f"\nErro: {e}")
+
 
 if __name__ == "__main__":
     main()
