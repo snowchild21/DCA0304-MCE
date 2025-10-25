@@ -52,9 +52,9 @@ Nmax = 20                    # número máximo de iterações
 
 
 def eliminacao_gauss(A, B):
-    # Faz cópias para não alterar as originais
+    # Cópias para não alterar originais
     A = [row.copy() for row in A]
-    B = [row.copy() for row in B]
+    B = [[b] if isinstance(b, (int, float)) else b.copy() for b in B]
     n = len(A)
 
     # Matriz aumentada
@@ -64,8 +64,10 @@ def eliminacao_gauss(A, B):
     # Eliminação direta
     for i in range(n):
         piv = A[i][i]
+        if abs(piv) < 1e-12:
+            raise ValueError(f"Pivô zero detectado na linha {i}")
         for j in range(i, n+1):
-            A[i][j] = A[i][j] / piv
+            A[i][j] /= piv
         for k in range(i+1, n):
             fator = A[k][i]
             for j in range(i, n+1):
@@ -86,17 +88,22 @@ def eliminacao_gauss(A, B):
 # ==============================================================
 iteracoes = [X.copy()]  # armazena os vetores de cada iteração
 
+print(f"| {'Iter':>4} | {'x':>12} | {'y':>12} | {'Δx':>13} | {'Δy':>13} |")
+print("=" * 70)
+
 for k in range(Nmax):
     Fx = F(X)
     Jx = J(X)
 
-    # Corrigido: resolver Jx * delta = Fx
-    delta = eliminacao_gauss(Jx.tolist(), (Fx).reshape(-1, 1).tolist())
+    delta = eliminacao_gauss(Jx.tolist(), (-Fx).tolist())
 
     X = X + delta
     iteracoes.append(X.copy())
 
-    if delta[0] < tol and delta[1] < tol:
+    print(
+        f"| {k+1:4d} | {X[0]:+12.6f} | {X[1]:+12.6f} | {delta[0]:+12.6e} | {delta[1]:+12.6e} |")
+
+    if abs(delta[0]) < tol and abs(delta[1]) < tol:
         print(f"Convergência alcançada na iteração {k+1}")
         break
 else:
