@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 # f2(x,y) = y + 3*x*y^2 - 57
 # --------------------------------------------------------------
 
+
 def F(X):
     """
     Calcula o vetor F(X) = [f1(x, y), f2(x, y)]^T
@@ -49,25 +50,53 @@ X = np.array([10.0, 10.0])   # vetor inicial [x0, y0]
 tol = 1e-5                   # tolerância
 Nmax = 20                    # número máximo de iterações
 
+
+def eliminacao_gauss(A, B):
+    # Faz cópias para não alterar as originais
+    A = [row.copy() for row in A]
+    B = [row.copy() for row in B]
+    n = len(A)
+
+    # Matriz aumentada
+    for i in range(n):
+        A[i].append(B[i][0])
+
+    # Eliminação direta
+    for i in range(n):
+        piv = A[i][i]
+        for j in range(i, n+1):
+            A[i][j] = A[i][j] / piv
+        for k in range(i+1, n):
+            fator = A[k][i]
+            for j in range(i, n+1):
+                A[k][j] -= fator * A[i][j]
+
+    # Substituição regressiva
+    Xsol = [0] * n
+    for i in range(n-1, -1, -1):
+        Xsol[i] = A[i][n]
+        for j in range(i+1, n):
+            Xsol[i] -= A[i][j] * Xsol[j]
+
+    return np.array(Xsol)
+
+
 # ==============================================================
 # LOOP ITERATIVO DO MÉTODO DE NEWTON-RAPHSON
 # ==============================================================
 iteracoes = [X.copy()]  # armazena os vetores de cada iteração
 
 for k in range(Nmax):
-    # Calcula F(X) e J(X)
     Fx = F(X)
     Jx = J(X)
 
-    # Calcula a variação ΔX = -J^{-1}(X) * F(X)
-    delta = np.linalg.solve(Jx, -Fx)
+    # Corrigido: resolver Jx * delta = Fx
+    delta = eliminacao_gauss(Jx.tolist(), (Fx).reshape(-1, 1).tolist())
 
-    # Atualiza o vetor X
     X = X + delta
     iteracoes.append(X.copy())
 
-    # Critério de parada: norma infinita da variação menor que tolerância
-    if np.linalg.norm(delta, ord=np.inf) < tol:
+    if delta[0] < tol and delta[1] < tol:
         print(f"Convergência alcançada na iteração {k+1}")
         break
 else:
@@ -89,8 +118,8 @@ print(f"f2(x,y) = {Fx_final[1]:.6e}")
 # PLOTAGEM DA EVOLUÇÃO DAS ITERAÇÕES
 # ==============================================================
 iteracoes = np.array(iteracoes)
-plt.figure(figsize=(8,5))
-plt.plot(iteracoes[:,0], iteracoes[:,1], 'o-', label='Iterações (x,y)')
+plt.figure(figsize=(8, 5))
+plt.plot(iteracoes[:, 0], iteracoes[:, 1], 'o-', label='Iterações (x,y)')
 plt.title('Evolução das iterações – Método de Newton-Raphson')
 plt.xlabel('x')
 plt.ylabel('y')
